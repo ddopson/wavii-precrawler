@@ -10,7 +10,7 @@ end
 
 class Selenium::WebDriver::Driver
   def private_bridge_object
-    self.bridge
+    @bridge
   end
 end
 
@@ -34,7 +34,7 @@ class Wavii::PreCrawler < Sinatra::Base
     t_start = Time.now
     driver.navigate.to "https://wavii.com/news/#{path}"
 
-    puts "Navigation to '#{path}' finished in #{Time.now - t_start} seconds"
+    puts "Navigation to '#{path}' finished in #{Time.now - t_start} seconds. Waiting for AJAX"
     driver.private_bridge_object.setScriptTimeout(20000)
     foo = driver.execute_async_script("
       var cb = arguments[0];
@@ -44,7 +44,7 @@ class Wavii::PreCrawler < Sinatra::Base
       $.ajax('FAIL_ME');
     ")
 
-    puts "Navigation to '#{path}' finished in #{Time.now - t_start} seconds. Foo=#{foo}"
+    puts "Navigation+AJAX to '#{path}' finished in #{Time.now - t_start} seconds."
 
     driver.execute_script('$("script").remove()')
     html = driver.page_source
