@@ -4,10 +4,12 @@ GEM
     childprocess (0.3.7)
       ffi (~> 1.0, >= 1.0.6)
     ffi (1.3.1)
+    kgio (2.7.4)
     multi_json (1.5.0)
     rack (1.5.1)
     rack-protection (1.3.2)
       rack
+    raindrops (0.10.0)
     rubyzip (0.9.9)
     selenium-webdriver (2.29.0)
       childprocess (>= 0.2.5)
@@ -19,6 +21,10 @@ GEM
       rack-protection (~> 1.3)
       tilt (~> 1.3, >= 1.3.3)
     tilt (1.3.3)
+    unicorn (4.1.1)
+      kgio (~> 2.4)
+      rack
+      raindrops (~> 0.6)
     websocket (1.0.7)
 
 PLATFORMS
@@ -27,3 +33,4 @@ PLATFORMS
 DEPENDENCIES
   selenium-webdriver
   sinatra
+  unicorn
