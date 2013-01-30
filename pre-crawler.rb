@@ -20,6 +20,11 @@ class Wavii::PreCrawler < Sinatra::Base
   end
   
   def self.after_fork!
+    if RUBY_PLATFORM.match /linux/
+      require 'headless'
+      headless = Headless.new
+      headless.start
+    end
     @driver = Selenium::WebDriver.for :firefox
   end
 
