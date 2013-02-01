@@ -35,9 +35,9 @@ class Wavii::PreCrawler < Sinatra::Base
   get '/*/*' do |path, id|
     driver = self.class.driver
 
-    puts "Navigating to 'local.wavii.com/#{path}/#{id}'"
+    puts "Navigating to 'local.wavii.com:3000/#{path}/#{id}'"
     t_start = Time.now
-    driver.navigate.to "http://local.wavii.com/#{path}/#{id}"
+    driver.navigate.to "http://local.wavii.com:3000/#{path}/#{id}"
 
     puts "Navigation to '#{path}/#{id}' finished in #{Time.now - t_start} seconds. Waiting for AJAX"
     driver.private_bridge_object.setScriptTimeout(20000)
