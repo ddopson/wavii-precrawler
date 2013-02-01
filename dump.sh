@@ -19,8 +19,9 @@ function obfuscate() {
 }
 
 LIMIT=${LIMIT-"LIMIT 10"}
-do_mysql -e "select name                         from slugs where sluggable_type = 'Persistence::Topic' AND deleted_at IS NULL AND sequence = 1 $LIMIT;" | perl -pe 's#^#/topics/#' | row_count "Topics1"
-do_mysql -e "select CONCAT(name, '--', sequence) from slugs where sluggable_type = 'Persistence::Topic' AND deleted_at IS NULL AND sequence != 1 $LIMIT;" | perl -pe 's#^#/topics/#' | row_count "Topics2"
+FROM_T='from slugs left join topics on (topics.cached_slug = slugs.name)'
+do_mysql -e "select slugs.name                         $FROM_T where sluggable_type = 'Persistence::Topic' AND slugs.deleted_at IS NULL AND search_priority > 0 AND sequence = 1 $LIMIT;" | perl -pe 's#^#/topics/#' | row_count "Topics1"
+do_mysql -e "select CONCAT(slugs.name, '--', sequence) $FROM_T where sluggable_type = 'Persistence::Topic' AND slugs.deleted_at IS NULL AND search_priority > 0 AND sequence != 1 $LIMIT;" | perl -pe 's#^#/topics/#' | row_count "Topics2"
 
 do_mysql -e "select name                         from slugs where sluggable_type = 'User' AND deleted_at IS NULL AND sequence = 1 $LIMIT;" | perl -pe 's#^#/profile/#' | row_count "Users1"
 do_mysql -e "select CONCAT(name, '--', sequence) from slugs where sluggable_type = 'User' AND deleted_at IS NULL AND sequence != 1 $LIMIT;" | perl -pe 's#^#/profile/#' | row_count "Users2"
