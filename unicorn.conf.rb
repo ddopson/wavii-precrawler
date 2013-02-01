@@ -4,6 +4,6 @@ after_fork do |server,worker|
   ::Wavii::PreCrawler.after_fork!
 end
 
-worker_processes 2
+worker_processes 4
 
 listen 4567

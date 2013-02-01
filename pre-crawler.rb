@@ -32,14 +32,14 @@ class Wavii::PreCrawler < Sinatra::Base
     @driver
   end
 
-  get '/news/*' do |path|
+  get '/*/*' do |path, id|
     driver = self.class.driver
 
-    puts "Navigating to 'wavii.com/news/#{path}'"
+    puts "Navigating to 'wavii.com/#{path}/#{id}'"
     t_start = Time.now
-    driver.navigate.to "https://wavii.com/news/#{path}"
+    driver.navigate.to "https://wavii.com/#{path}/#{id}"
 
-    puts "Navigation to '#{path}' finished in #{Time.now - t_start} seconds. Waiting for AJAX"
+    puts "Navigation to '#{path}/#{id}' finished in #{Time.now - t_start} seconds. Waiting for AJAX"
     driver.private_bridge_object.setScriptTimeout(20000)
     foo = driver.execute_async_script("
       var cb = arguments[0];
@@ -49,7 +49,7 @@ class Wavii::PreCrawler < Sinatra::Base
       $.ajax('FAIL_ME');
     ")
 
-    puts "Navigation+AJAX to '#{path}' finished in #{Time.now - t_start} seconds."
+    puts "Navigation+AJAX to '#{path}/#{id}' finished in #{Time.now - t_start} seconds."
 
     driver.execute_script('$("script").remove()')
     html = driver.page_source
