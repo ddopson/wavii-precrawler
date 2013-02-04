@@ -5,5 +5,11 @@ after_fork do |server,worker|
 end
 
 worker_processes 4
+listen 4567, :tcp_nodelay => true, :backlog => 16
+timeout 60
+pid "log/unicorn.pid"
 
-listen 4567
+if ENV['RACK_ENV'] == 'production'
+  logger Logger.new('log/crawler.log')
+end
+

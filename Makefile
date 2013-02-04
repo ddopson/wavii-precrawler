@@ -9,9 +9,9 @@ bundle:
 
 .PHONY: run               # Run the service interactively
 run:
-	bundle exec unicorn -c unicorn.conf.rb
+	bundle exec unicorn -c unicorn.conf.rb -Edevelopment
 
 .PHONY: start             # Start the service as a daemon
 start:
-	bundle exec unicorn -c unicorn.conf.rb -D 
+	bundle exec unicorn -c unicorn.conf.rb -D -Eproduction
 
