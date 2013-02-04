@@ -1,12 +1,13 @@
 #!/usr/bin/env ruby
 
 require 'rubygems'
-# require 'headless'
-require 'selenium-webdriver'
 require 'sinatra/base'
+require 'selenium-webdriver'
+
 
 module Wavii
 end
+
 
 class Selenium::WebDriver::Driver
   def private_bridge_object
@@ -14,7 +15,9 @@ class Selenium::WebDriver::Driver
   end
 end
 
+
 class Wavii::PreCrawler < Sinatra::Base
+  BASE_URL = 'https://wavii.com'
   configure :production, :development do
     enable :logging
   end
@@ -35,11 +38,14 @@ class Wavii::PreCrawler < Sinatra::Base
   get '/*/*' do |path, id|
     driver = self.class.driver
 
-    puts "Navigating to 'local.wavii.com:3000/#{path}/#{id}'"
-    t_start = Time.now
-    driver.navigate.to "http://local.wavii.com:3000/#{path}/#{id}"
+    url = "#{BASE_URL}/#{path}/#{id}"
 
-    puts "Navigation to '#{path}/#{id}' finished in #{Time.now - t_start} seconds. Waiting for AJAX"
+    logger.info "Step1: Navigating to '#{url}'"
+    t_start = Time.now
+    driver.navigate.to "#{url}"
+
+    t_nav = Time.now
+    logger.info "Step2: Navigation to '#{url}' finished in #{t_nav - t_start} seconds. Waiting for AJAX"
     driver.private_bridge_object.setScriptTimeout(20000)
     foo = driver.execute_async_script("
       var cb = arguments[0];
@@ -49,12 +55,12 @@ class Wavii::PreCrawler < Sinatra::Base
       $.ajax('FAIL_ME');
     ")
 
-    puts "Navigation+AJAX to '#{path}/#{id}' finished in #{Time.now - t_start} seconds."
+    logger.info "Step3: Navigation+AJAX to '#{url}' finished in #{Time.now - t_nav} seconds."
 
     driver.execute_script('$("script").remove()')
     html = driver.page_source
     
-    puts "Returning #{html.size} bytes to the client. Request took #{Time.now - t_start} seconds"
+    logger.info "Returning #{html.size} bytes to the client. Request for '#{url}' took #{Time.now - t_start} seconds"
     return html
   end
 end
