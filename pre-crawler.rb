@@ -28,7 +28,12 @@ class Wavii::PreCrawler < Sinatra::Base
       headless = Headless.new
       headless.start
     end
-    @driver = Selenium::WebDriver.for :firefox
+    profile = Selenium::WebDriver::Firefox::Profile.new
+    profile['permissions.default.stylesheet'] = 2
+    profile['permissions.default.image'] = 2
+    profile['dom.ipc.plugins.enabled.libflashplayer.so'] = 'false'
+
+    @driver = Selenium::WebDriver.for(:firefox, profile: profile)
   end
 
   def self.driver
