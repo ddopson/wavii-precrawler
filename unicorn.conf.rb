@@ -13,6 +13,7 @@ if ENV['RACK_ENV'] == 'production'
   puts "We are daemonizing and writing to log file 'log/crawler.log'"
   require 'fileutils'
   FileUtils.mkdir_p('log')
-  logger Logger.new('log/crawler.log')
+  stdout_path 'log/crawler.log'
+  stderr_path 'log/crawler.log'
 end
 

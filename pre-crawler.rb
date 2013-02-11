@@ -18,7 +18,7 @@ end
 
 class Wavii::PreCrawler < Sinatra::Base
   BASE_URL = 'https://wavii.com'
-  configure :production, :development do
+  configure :development, :production do
     enable :logging
   end
   
@@ -40,9 +40,10 @@ class Wavii::PreCrawler < Sinatra::Base
     @driver
   end
 
-  get '/*/*' do |path, id|
+  get '/**' do |path, id|
     driver = self.class.driver
 
+    logger.info "path=#{path}, id=#{id}"
     url = "#{BASE_URL}/#{path}/#{id}"
 
     logger.info "Step1: Navigating to '#{url}'"
@@ -51,18 +52,22 @@ class Wavii::PreCrawler < Sinatra::Base
 
     t_nav = Time.now
     logger.info "Step2: Navigation to '#{url}' finished in #{t_nav - t_start} seconds. Waiting for AJAX"
-    driver.private_bridge_object.setScriptTimeout(20000)
-    foo = driver.execute_async_script("
-      var cb = arguments[0];
-      $(document).ajaxStop(function () {
-        cb('done');
-      });
-      $.ajax('FAIL_ME');
-    ")
+    begin
+      driver.private_bridge_object.setScriptTimeout(20000)
+      foo = driver.execute_async_script("
+        var cb = arguments[0];
+        $(document).ajaxStop(function () {
+          cb('done');
+        });
+        $.ajax('FAIL_ME');
+      ")
 
-    logger.info "Step3: Navigation+AJAX to '#{url}' finished in #{Time.now - t_nav} seconds."
+      logger.info "Step3: Navigation+AJAX to '#{url}' finished in #{Time.now - t_nav} seconds."
 
-    driver.execute_script('$("script").remove()')
+      driver.execute_script('$("script").remove()')
+    rescue Exception => e
+      logger.warn "Url '#{url}' generated error #{e.message}"
+    end
     html = driver.page_source
     
     logger.info "Returning #{html.size} bytes to the client. Request for '#{url}' took #{Time.now - t_start} seconds"

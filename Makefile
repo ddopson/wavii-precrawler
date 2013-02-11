@@ -13,5 +13,12 @@ run:
 
 .PHONY: start             # Start the service as a daemon
 start:
-	bundle exec unicorn -c unicorn.conf.rb -D -Eproduction
+	bundle exec unicorn -c $(CURDIR)/unicorn.conf.rb -Eproduction -D
 
+.PHONY: ps
+ps:
+	ps aux | grep $(CURDIR)/unicorn.conf.rb | grep -v grep
+
+.PHONY: tail
+tail:
+	tail -f $(CURDIR)/log/crawler.log
