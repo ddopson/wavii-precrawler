@@ -64,7 +64,7 @@ class Wavii::PreCrawler < Sinatra::Base
 
       logger.info "Step3: Navigation+AJAX to '#{url}' finished in #{Time.now - t_nav} seconds."
 
-      driver.execute_script('$("script").remove()')
+      driver.execute_script('$("script,.report-error").remove()')
     rescue Exception => e
       logger.warn "Url '#{url}' generated error #{e.message}"
     end
