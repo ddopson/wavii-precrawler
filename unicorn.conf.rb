@@ -4,7 +4,7 @@ after_fork do |server,worker|
   ::Wavii::PreCrawler.after_fork!
 end
 
-worker_processes 4
+worker_processes 8
 listen 4567, :tcp_nodelay => true, :backlog => 16
 timeout 60
 pid "log/unicorn.pid"
