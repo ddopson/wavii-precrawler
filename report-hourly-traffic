@@ -1,0 +1,26 @@
+#!/bin/bash
+
+process() {
+  perl -ne '
+    $fmt = "$curr_hour %4d / %-4d (%0.1f%%)\n";
+    ($hour) = m/\[([^:]+:[^:]+):/;
+    if ($hour ne $curr_hour) {
+      if ($curr_hour) {
+        printf $fmt, $fail, $tot, (100.0*$fail/$tot);
+        $fail = $tot = 0;
+      }
+      $curr_hour = $hour;
+    }
+    $tot++;
+    $fail++ unless (m#HTTP/1.1" 200#);
+    END {
+      printf $fmt, $fail, $tot, (100.0*$fail/$tot);
+    }
+  '
+}
+
+(
+  zcat /var/log/nginx/access.log.{5,4,3,2}.gz
+  cat /var/log/nginx/access.log.1 /var/log/nginx/access.log
+) | process
+
